@@ -152,5 +152,27 @@ class SharedPreferenceTest {
         assertEquals(3, sharedPreferences.getPeopleList().size)
     }
 
+    @Test fun testRemoveLongKey() {
+        editor.clear().commit()
+
+        val value = 1L
+        editor.putPoints(value)
+
+        assertEquals(1, sharedPreferences.getPoints(0L))
+        editor.removePoints()
+        assertEquals(sharedPreferences.getPoints(0), 0)
+    }
+
+    @Test fun testRemoveStringKey() {
+        editor.clear().commit()
+
+        val value = "new message"
+        editor.putMessage(value)
+
+        assertEquals(value, sharedPreferences.getMessage())
+        editor.removeMessage()
+        assertEquals(sharedPreferences.getMessage(), "hello")
+    }
+
 
 }

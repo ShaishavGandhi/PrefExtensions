@@ -24,7 +24,10 @@ import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.PackageElement
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import javax.tools.Diagnostic
@@ -93,6 +96,8 @@ class PreferenceProcessor: AbstractProcessor() {
         for (element in elements) {
             val key = getElementKey(element)
             val elementName = element.simpleName.toString()
+            var receiver = sharedPreferenceClass
+
             val returnType: TypeName? = kotlinMapper[element.asType().toString()]
             val preferenceType = preferenceMapper[element.asType().toString()]
 
@@ -101,7 +106,7 @@ class PreferenceProcessor: AbstractProcessor() {
 
                 // Getter
                 fileBuilder.addFunction(FunSpec.builder("get${elementName.capitalize()}")
-                    .receiver(sharedPreferenceClass)
+                    .receiver(receiver)
                     .returns(returnType)
                     .addParameter(ParameterSpec.builder("defaultValue", returnType)
                         .defaultValue("%L", defaultValue)
@@ -115,6 +120,12 @@ class PreferenceProcessor: AbstractProcessor() {
                     .addParameter(ParameterSpec.builder(elementName, returnType)
                         .build())
                     .addStatement("put%L(\"%L\", %L).apply()", preferenceType, key, elementName)
+                    .build())
+
+                // Remover
+                fileBuilder.addFunction(FunSpec.builder("remove${elementName.capitalize()}")
+                    .receiver(editorClass)
+                    .addStatement("remove(\"%L\").apply()", key)
                     .build())
             } else {
                 messager.printMessage(Diagnostic.Kind.ERROR, "Couldn't recognize for type ${element.asType()}")
@@ -152,6 +163,19 @@ class PreferenceProcessor: AbstractProcessor() {
 
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
+    }
+
+    private fun getEnclosingClassName(element: Element): ClassName {
+        val classname = element.enclosingElement.simpleName.toString()
+        val packageName: String
+        var enclosing = element
+        while (enclosing.kind != ElementKind.PACKAGE) {
+            enclosing = enclosing.enclosingElement
+        }
+        val packageElement = enclosing as PackageElement
+        packageName = packageElement.toString()
+
+        return ClassName.bestGuess("$packageName.$classname")
     }
 
 }

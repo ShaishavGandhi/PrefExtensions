@@ -1,24 +1,8 @@
 # PrefExtensions
 
-![CircleCI branch](https://img.shields.io/circleci/project/github/shaishavgandhi05/PrefExtensions/master.svg)
-
 Declarative extensions on SharedPreferences and Editor with the help of annotation processing.
 
-## Download
-
-
-![Maven Central](https://img.shields.io/maven-central/v/com.shaishavgandhi/prefextensions-compiler.svg)
-
-
-```groovy
-dependencies {
-  compileOnly 'com.shaishavgandhi:prefextensions-annotations:x.y.z'
-  kapt 'com.shaishavgandhi:prefextensions-compiler:x.y.z'
-}
-```
-
-Snapshots of the development version are available in [Sonatype's snapshots repository.](https://oss.sonatype.org/content/repositories/snapshots/)
-
+This project is being continued at [PreferenceX](https://github.com/Glassdoor/PreferenceX)
 
 ## Use Case
 
